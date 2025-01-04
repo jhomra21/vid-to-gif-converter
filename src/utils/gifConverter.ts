@@ -12,12 +12,16 @@ export const convertVideoToGif = (
     const video = document.createElement('video');
     video.src = URL.createObjectURL(videoFile);
     
+    video.onloadedmetadata = () => {
+      video.currentTime = 0;
+    };
+    
     video.onloadeddata = () => {
       const canvas = document.createElement('canvas');
-      // Add willReadFrequently attribute to optimize canvas operations
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       
       if (!ctx) {
+        URL.revokeObjectURL(video.src);
         reject(new Error('Failed to get canvas context'));
         return;
       }
@@ -30,50 +34,50 @@ export const convertVideoToGif = (
       
       const gif = new GIF({
         workers: 2,
-        quality: Math.round(31 - (settings.quality * 0.3)), // Convert 1-100 to 30-1 (lower is better)
+        quality: Math.round(31 - (settings.quality * 0.3)),
         width: settings.width,
         height: height,
         workerScript: '/gif.worker.js'
       });
 
-      let framesProcessed = 0;
-      const frameCount = Math.round((video.duration * settings.fps));
-
-      function addFrame() {
-        if (framesProcessed >= frameCount) {
-          gif.render();
-          return;
-        }
-
-        const currentTime = framesProcessed / settings.fps;
-        if (currentTime > video.duration) {
-          gif.render();
-          return;
-        }
-
-        video.currentTime = currentTime;
-        framesProcessed++;
-
-        video.onseeked = () => {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          gif.addFrame(ctx, { copy: true, delay: 1000 / settings.fps });
-          addFrame();
-        };
+      const frames: number[] = [];
+      const duration = video.duration;
+      const frameInterval = 1 / settings.fps;
+      
+      for (let time = 0; time < duration; time += frameInterval) {
+        frames.push(time);
       }
 
+      let currentFrameIndex = 0;
+
+      const processNextFrame = () => {
+        if (currentFrameIndex >= frames.length) {
+          gif.render();
+          return;
+        }
+
+        video.currentTime = frames[currentFrameIndex];
+      };
+
+      video.onseeked = () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        gif.addFrame(ctx, { copy: true, delay: 1000 / settings.fps });
+        currentFrameIndex++;
+        processNextFrame();
+      };
+
       gif.on('finished', (blob: Blob) => {
-        // Clean up resources
         URL.revokeObjectURL(video.src);
         resolve(blob);
       });
 
       gif.on('error', (error: Error) => {
-        // Clean up resources
         URL.revokeObjectURL(video.src);
         reject(error);
       });
 
-      addFrame();
+      // Start processing frames
+      processNextFrame();
     };
 
     video.onerror = () => {
