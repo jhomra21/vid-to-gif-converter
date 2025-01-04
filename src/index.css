@@ -47,7 +47,7 @@
 
 @layer utilities {
   .bg-industrial-gradient {
-    background: linear-gradient(to right, #ffffff, #f1f1f1);
+    background: linear-gradient(to bottom, #ffffff, #71717a);
   }
   
   .bg-industrial-accent {

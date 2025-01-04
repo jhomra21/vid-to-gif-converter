@@ -28,9 +28,9 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
           <Slider
             value={[settings.fps]}
             onValueChange={(value) => onSettingsChange({ ...settings, fps: value[0] })}
-            min={1}
-            max={30}
-            step={1}
+            min={5}
+            max={60}
+            step={5}
           />
           <span className="text-sm text-muted-foreground">{settings.fps} FPS</span>
         </div>
@@ -40,9 +40,9 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
           <Slider
             value={[settings.quality]}
             onValueChange={(value) => onSettingsChange({ ...settings, quality: value[0] })}
-            min={1}
+            min={10}
             max={100}
-            step={1}
+            step={10}
           />
           <span className="text-sm text-muted-foreground">{settings.quality}%</span>
         </div>
@@ -53,6 +53,9 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
             type="number"
             value={settings.width}
             onChange={(e) => onSettingsChange({ ...settings, width: parseInt(e.target.value) || 0 })}
+            min={100}
+            max={1920}
+            step={10}
             className="max-w-[200px]"
           />
         </div>

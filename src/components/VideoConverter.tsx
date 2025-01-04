@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Download } from "lucide-react";
 import { convertVideoToGif } from '@/utils/gifConverter';
 import FileUpload from './FileUpload';
 import ConversionSettings from './ConversionSettings';
+import ConversionProgress from './ConversionProgress';
 import ConvertedFilesList from './ConvertedFilesList';
 
 interface ConvertedFile {
@@ -18,9 +17,9 @@ const VideoConverter = () => {
   const [video, setVideo] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [settings, setSettings] = useState({
-    fps: 15,
-    quality: 75,
-    width: 480,
+    fps: 30,
+    quality: 80,
+    width: 800,
   });
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
@@ -79,23 +78,10 @@ const VideoConverter = () => {
               onSettingsChange={setSettings}
             />
 
-            <Button
-              onClick={handleConvert}
-              disabled={isConverting}
-              className="w-full bg-industrial-accent hover:bg-industrial-accent/90"
-            >
-              {isConverting ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin" />
-                  Converting...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Download className="w-4 h-4" />
-                  Convert & Download
-                </span>
-              )}
-            </Button>
+            <ConversionProgress 
+              isConverting={isConverting}
+              onConvert={handleConvert}
+            />
           </>
         )}
 
