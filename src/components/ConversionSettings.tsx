@@ -2,11 +2,16 @@ import React from 'react';
 import { Settings } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface ConversionSettings {
   fps: number;
   quality: number;
   width: number;
+  dither: boolean;
+  optimizePalette: boolean;
+  ditherStrength: number;
 }
 
 interface ConversionSettingsProps {
@@ -48,14 +53,14 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
             <Slider
               value={[settings.quality]}
               onValueChange={(value) => onSettingsChange({ ...settings, quality: value[0] })}
-              min={10}
+              min={1}
               max={100}
-              step={10}
+              step={1}
               className="py-4"
             />
           </div>
           <div className="flex justify-between text-sm text-gray-600">
-            <span>10%</span>
+            <span>1%</span>
             <span className="font-mono text-gray-900">{settings.quality}%</span>
             <span>100%</span>
           </div>
@@ -75,6 +80,47 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
           <div className="flex justify-between text-xs text-gray-500">
             <span>Min: 100px</span>
             <span>Max: 1920px</span>
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="dither" className="text-sm text-gray-600">Enable Dithering</Label>
+            <Switch
+              id="dither"
+              checked={settings.dither}
+              onCheckedChange={(checked) => onSettingsChange({ ...settings, dither: checked })}
+            />
+          </div>
+
+          {settings.dither && (
+            <div className="space-y-2">
+              <label className="text-sm text-gray-600">Dither Strength</label>
+              <div className="px-1">
+                <Slider
+                  value={[settings.ditherStrength]}
+                  onValueChange={(value) => onSettingsChange({ ...settings, ditherStrength: value[0] })}
+                  min={1}
+                  max={10}
+                  step={1}
+                  className="py-4"
+                />
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Low</span>
+                <span className="font-mono text-gray-900">{settings.ditherStrength}</span>
+                <span>High</span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <Label htmlFor="optimize" className="text-sm text-gray-600">Optimize Color Palette</Label>
+            <Switch
+              id="optimize"
+              checked={settings.optimizePalette}
+              onCheckedChange={(checked) => onSettingsChange({ ...settings, optimizePalette: checked })}
+            />
           </div>
         </div>
       </div>

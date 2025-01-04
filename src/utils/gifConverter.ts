@@ -30,6 +30,9 @@ export const convertVideoToGif = async (
     fps: number;
     quality: number;
     width: number;
+    dither: boolean;
+    optimizePalette: boolean;
+    ditherStrength: number;
   },
   onLog: (message: string) => void
 ): Promise<Blob> => {
@@ -41,6 +44,7 @@ export const convertVideoToGif = async (
     
     const inputFileName = 'input-' + Date.now() + '.mp4';
     const outputFileName = 'output.gif';
+    const paletteFileName = 'palette.png';
     
     ffmpeg.on('log', ({ message }) => {
       onLog(message);
@@ -58,22 +62,53 @@ export const convertVideoToGif = async (
     const aspectRatio = dimensions.width / dimensions.height;
     const height = Math.round(settings.width / aspectRatio);
     
-    const fps = Math.min(settings.fps, 30);
+    const fps = Math.min(settings.fps, 60);
     const scale = `scale=${settings.width}:${height}:flags=lanczos`;
     
-    await ffmpeg.exec([
-      '-i', inputFileName,
-      '-vf', `${scale},fps=${fps}`,
-      '-gifflags', '+transdiff',
-      '-y', outputFileName
-    ]);
+    // Advanced filtering options based on settings
+    const filters = [];
+    filters.push(scale);
+    filters.push(`fps=${fps}`);
+    
+    if (settings.optimizePalette) {
+      // Generate a high-quality palette first
+      await ffmpeg.exec([
+        '-i', inputFileName,
+        '-vf', `${filters.join(',')},palettegen=stats_mode=full:max_colors=256`,
+        '-y', paletteFileName
+      ]);
+      
+      // Apply the palette with dithering settings
+      const paletteuse = settings.dither
+        ? `paletteuse=dither=floyd_steinberg:diff_mode=rectangle:bayer_scale=${settings.ditherStrength}`
+        : 'paletteuse=dither=none';
+      
+      await ffmpeg.exec([
+        '-i', inputFileName,
+        '-i', paletteFileName,
+        '-lavfi', `${filters.join(',')},${paletteuse}`,
+        '-y', outputFileName
+      ]);
+    } else {
+      // Direct conversion with basic settings
+      await ffmpeg.exec([
+        '-i', inputFileName,
+        '-vf', filters.join(','),
+        '-gifflags', '+transdiff',
+        '-y', outputFileName
+      ]);
+    }
     
     onLog('Reading converted file...');
     const data = await ffmpeg.readFile(outputFileName);
     const gifBlob = new Blob([data], { type: 'image/gif' });
     
+    // Cleanup
     await ffmpeg.deleteFile(inputFileName);
     await ffmpeg.deleteFile(outputFileName);
+    if (settings.optimizePalette) {
+      await ffmpeg.deleteFile(paletteFileName);
+    }
     
     onLog('Conversion complete!');
     return gifBlob;

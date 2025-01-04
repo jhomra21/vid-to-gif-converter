@@ -22,6 +22,9 @@ const VideoConverter = () => {
     fps: 30,
     quality: 80,
     width: 800,
+    dither: true,
+    optimizePalette: true,
+    ditherStrength: 5,
   });
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
