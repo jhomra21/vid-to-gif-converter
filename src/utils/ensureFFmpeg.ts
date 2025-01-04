@@ -1,24 +1,33 @@
+import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { toBlobURL } from '@ffmpeg/util';
 
+let ffmpegInstance: FFmpeg | null = null;
+
 export const ensureFFmpeg = async () => {
+  if (ffmpegInstance) {
+    return ffmpegInstance;
+  }
+
   try {
-    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/umd';
+    const ffmpeg = new FFmpeg();
+    console.log('Starting FFmpeg load...');
     
-    const ffmpegCore = await fetch(`${baseURL}/ffmpeg-core.js`);
-    const ffmpegCoreWasm = await fetch(`${baseURL}/ffmpeg-core.wasm`);
-    
-    const ffmpegCoreBlob = await ffmpegCore.blob();
-    const ffmpegCoreWasmBlob = await ffmpegCoreWasm.blob();
-    
-    const ffmpegCoreURL = URL.createObjectURL(ffmpegCoreBlob);
-    const ffmpegCoreWasmURL = URL.createObjectURL(ffmpegCoreWasmBlob);
-    
-    return {
-      coreURL: ffmpegCoreURL,
-      wasmURL: ffmpegCoreWasmURL
-    };
+    await ffmpeg.load({
+      coreURL: await toBlobURL(
+        'https://unpkg.com/@ffmpeg/core@0.12.4/dist/umd/ffmpeg-core.js',
+        'text/javascript'
+      ),
+      wasmURL: await toBlobURL(
+        'https://unpkg.com/@ffmpeg/core@0.12.4/dist/umd/ffmpeg-core.wasm',
+        'application/wasm'
+      ),
+    });
+
+    console.log('FFmpeg loaded successfully');
+    ffmpegInstance = ffmpeg;
+    return ffmpeg;
   } catch (error) {
     console.error('Failed to load FFmpeg:', error);
-    throw error;
+    throw new Error('Failed to load FFmpeg. Please check your internet connection and try again.');
   }
 };

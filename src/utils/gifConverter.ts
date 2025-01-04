@@ -1,5 +1,6 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
+import { ensureFFmpeg } from './ensureFFmpeg';
 
 const getVideoDimensions = (videoFile: File): Promise<{ width: number, height: number }> => {
   return new Promise((resolve, reject) => {
@@ -32,17 +33,11 @@ export const convertVideoToGif = async (
   },
   onLog: (message: string) => void
 ): Promise<Blob> => {
-  const ffmpeg = new FFmpeg();
+  let ffmpeg: FFmpeg;
   
   try {
-    // Load ffmpeg
-    onLog('Loading FFmpeg...');
-    await ffmpeg.load({
-      coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
-      wasmURL: await toBlobURL('/ffmpeg-core.wasm', 'application/wasm'),
-    });
-    
-    onLog('FFmpeg loaded, starting conversion...');
+    ffmpeg = await ensureFFmpeg();
+    onLog('FFmpeg loaded successfully');
     
     // Write the input video file to FFmpeg's virtual filesystem
     const inputFileName = 'input-' + Date.now() + '.mp4';
@@ -50,6 +45,7 @@ export const convertVideoToGif = async (
     
     ffmpeg.on('log', ({ message }) => {
       onLog(message);
+      console.log(message);
     });
     
     ffmpeg.on('progress', ({ progress }) => {
@@ -67,9 +63,8 @@ export const convertVideoToGif = async (
     const height = Math.round(settings.width / aspectRatio);
     
     // Construct the FFmpeg command
-    const fps = Math.min(settings.fps, 30); // Cap FPS at 30 for reasonable file sizes
+    const fps = Math.min(settings.fps, 30);
     const scale = `scale=${settings.width}:${height}:flags=lanczos`;
-    const quality = Math.max(1, Math.min(settings.quality, 100)); // Ensure quality is between 1-100
     
     // Execute the conversion
     await ffmpeg.exec([
@@ -92,9 +87,8 @@ export const convertVideoToGif = async (
     return gifBlob;
     
   } catch (error) {
+    console.error('Conversion error:', error);
     onLog(`Error during conversion: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
-  } finally {
-    ffmpeg.terminate();
   }
 };
