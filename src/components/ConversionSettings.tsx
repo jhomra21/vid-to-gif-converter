@@ -25,26 +25,40 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
       <div className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm text-muted-foreground">Frame Rate (FPS)</label>
-          <Slider
-            value={[settings.fps]}
-            onValueChange={(value) => onSettingsChange({ ...settings, fps: value[0] })}
-            min={5}
-            max={60}
-            step={5}
-          />
-          <span className="text-sm text-muted-foreground">{settings.fps} FPS</span>
+          <div className="px-1">
+            <Slider
+              value={[settings.fps]}
+              onValueChange={(value) => onSettingsChange({ ...settings, fps: value[0] })}
+              min={5}
+              max={60}
+              step={5}
+              className="py-4"
+            />
+          </div>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>5 FPS</span>
+            <span className="font-mono">{settings.fps} FPS</span>
+            <span>60 FPS</span>
+          </div>
         </div>
 
         <div className="space-y-2">
           <label className="text-sm text-muted-foreground">Quality</label>
-          <Slider
-            value={[settings.quality]}
-            onValueChange={(value) => onSettingsChange({ ...settings, quality: value[0] })}
-            min={10}
-            max={100}
-            step={10}
-          />
-          <span className="text-sm text-muted-foreground">{settings.quality}%</span>
+          <div className="px-1">
+            <Slider
+              value={[settings.quality]}
+              onValueChange={(value) => onSettingsChange({ ...settings, quality: value[0] })}
+              min={10}
+              max={100}
+              step={10}
+              className="py-4"
+            />
+          </div>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>10%</span>
+            <span className="font-mono">{settings.quality}%</span>
+            <span>100%</span>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -56,8 +70,12 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
             min={100}
             max={1920}
             step={10}
-            className="max-w-[200px]"
+            className="font-mono bg-secondary border-secondary"
           />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Min: 100px</span>
+            <span>Max: 1920px</span>
+          </div>
         </div>
       </div>
     </div>
