@@ -17,16 +17,15 @@ export const ensureFFmpeg = async (): Promise<FFmpeg> => {
 
   ffmpeg = new FFmpeg();
 
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm';
   try {
     await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      coreURL: await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm'),
     });
   } catch (error) {
     console.error('Failed to load FFmpeg:', error);
     ffmpeg = null;
-    throw new Error('Failed to load FFmpeg. Please check your internet connection and try again.');
+    throw new Error('Failed to load FFmpeg. Please check if FFmpeg files are available and try again.');
   }
 
   return ffmpeg;
