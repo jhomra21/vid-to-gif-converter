@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -8,12 +8,14 @@ interface FileUploadProps {
 
 const FileUpload = ({ onFileSelect }: FileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string>('');
   const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('video/')) {
       const url = URL.createObjectURL(file);
+      setPreview(url);
       onFileSelect(file, url);
     } else {
       toast({
@@ -29,6 +31,7 @@ const FileUpload = ({ onFileSelect }: FileUploadProps) => {
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('video/')) {
       const url = URL.createObjectURL(file);
+      setPreview(url);
       onFileSelect(file, url);
     }
   };
