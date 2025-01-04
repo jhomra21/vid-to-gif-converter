@@ -28,7 +28,6 @@ export const convertVideoToGif = async (
   videoFile: File,
   settings: {
     fps: number;
-    quality: number;
     width: number;
     dither: boolean;
     optimizePalette: boolean;
@@ -48,7 +47,6 @@ export const convertVideoToGif = async (
     
     ffmpeg.on('log', ({ message }) => {
       onLog(message);
-      console.log(message);
     });
     
     ffmpeg.on('progress', ({ progress }) => {
@@ -117,13 +115,5 @@ export const convertVideoToGif = async (
     console.error('Conversion error:', error);
     onLog(`Error during conversion: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
-  } finally {
-    if (ffmpeg) {
-      try {
-        await ffmpeg.terminate();
-      } catch (e) {
-        console.error('Error terminating FFmpeg:', e);
-      }
-    }
   }
 };

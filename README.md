@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/54beb22f-d8dd-49e4-b8d8-a91e1415cb05
+**URL**: `https://lovable.dev/projects/54beb22f-d8dd-49e4-b8d8-a91e1415cb05`
 
 ## How can I edit this code?
 
@@ -24,16 +24,16 @@ Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+`git clone <YOUR_GIT_URL>`
 
 # Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+`cd <YOUR_PROJECT_NAME>`
 
 # Step 3: Install the necessary dependencies.
-npm i
+`npm i`
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+`npm run dev`
 ```
 
 **Edit a file directly in GitHub**
@@ -52,7 +52,7 @@ npm run dev
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript

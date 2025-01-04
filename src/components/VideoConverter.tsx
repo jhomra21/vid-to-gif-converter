@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { convertVideoToGif } from '@/utils/gifConverter';
-import { ensureFFmpeg } from '@/utils/ensureFFmpeg';
+import { ensureFFmpeg, terminateFFmpeg } from '@/utils/ensureFFmpeg';
 import FileUpload from './FileUpload';
 import ConversionSettings from './ConversionSettings';
 import ConversionProgress from './ConversionProgress';
@@ -13,6 +13,7 @@ interface ConvertedFile {
   name: string;
   url: string;
   timestamp: Date;
+  originalSize: number;
 }
 
 const VideoConverter = () => {
@@ -20,11 +21,13 @@ const VideoConverter = () => {
   const [preview, setPreview] = useState<string>('');
   const [settings, setSettings] = useState({
     fps: 30,
-    quality: 80,
     width: 800,
     dither: true,
     optimizePalette: true,
     ditherStrength: 5,
+    loop: 0,
+    compression: 6,
+    preserveAlpha: true,
   });
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
@@ -40,6 +43,11 @@ const VideoConverter = () => {
         variant: "destructive",
       });
     });
+
+    // Cleanup FFmpeg when component unmounts
+    return () => {
+      terminateFFmpeg();
+    };
   }, []);
 
   const handleFileSelect = (file: File, previewUrl: string) => {
@@ -50,7 +58,6 @@ const VideoConverter = () => {
 
   const addLog = (message: string) => {
     setConversionLogs(prev => [...prev, message]);
-    console.log(message); // Also log to console for debugging
   };
 
   const handleConvert = async () => {
@@ -58,7 +65,13 @@ const VideoConverter = () => {
     
     setIsConverting(true);
     setConversionLogs([]); // Clear previous logs
+    
     try {
+      // First terminate any existing instance
+      await terminateFFmpeg();
+      // Then ensure a fresh instance is loaded
+      await ensureFFmpeg();
+      // Now convert the video
       const gifBlob = await convertVideoToGif(video, settings, addLog);
       const gifUrl = URL.createObjectURL(gifBlob);
       
@@ -67,6 +80,7 @@ const VideoConverter = () => {
         name: video.name.replace(/\.[^/.]+$/, "") + ".gif",
         url: gifUrl,
         timestamp: new Date(),
+        originalSize: video.size,
       };
       
       setConvertedFiles(prev => [newFile, ...prev]);
@@ -75,6 +89,7 @@ const VideoConverter = () => {
         description: "Your GIF is ready to download!",
       });
     } catch (error) {
+      console.error('Conversion error:', error);
       toast({
         title: "Conversion failed",
         description: error instanceof Error ? error.message : "An error occurred during conversion",
