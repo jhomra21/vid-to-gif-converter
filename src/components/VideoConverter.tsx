@@ -86,7 +86,7 @@ const VideoConverter = () => {
             >
               {isConverting ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-t-transparent border-white animate-spin" />
+                  <div className="w-5 h-5 border-2 border-t-transparent border-white rounded-full animate-spin" />
                   Converting...
                 </span>
               ) : (
