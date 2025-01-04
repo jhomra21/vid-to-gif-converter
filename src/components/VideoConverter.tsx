@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, Settings, Download } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+interface ConvertedFile {
+  id: string;
+  name: string;
+  url: string;
+  timestamp: Date;
+}
 
 const VideoConverter = () => {
   const [video, setVideo] = useState<File | null>(null);
@@ -14,6 +22,7 @@ const VideoConverter = () => {
     width: 480,
   });
   const [isConverting, setIsConverting] = useState(false);
+  const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -47,6 +56,16 @@ const VideoConverter = () => {
     // In a real implementation, we would convert the video to GIF here
     // For now, we'll just simulate the conversion
     await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Add the converted file to the list
+    const newFile: ConvertedFile = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: video?.name.replace(/\.[^/.]+$/, "") + ".gif",
+      url: preview, // In a real implementation, this would be the GIF URL
+      timestamp: new Date(),
+    };
+    
+    setConvertedFiles(prev => [newFile, ...prev]);
     setIsConverting(false);
     toast({
       title: "Conversion complete",
@@ -63,13 +82,13 @@ const VideoConverter = () => {
         </div>
 
         <div
-          className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+          className="border-2 border-dashed border-border bg-background hover:bg-secondary/50 transition-colors cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
           {!preview ? (
-            <div className="space-y-4">
+            <div className="p-8 space-y-4">
               <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
               <div>
                 <p className="text-lg">Drag and drop your video here</p>
@@ -80,7 +99,7 @@ const VideoConverter = () => {
             <video
               src={preview}
               controls
-              className="max-w-full max-h-[400px] mx-auto"
+              className="w-full h-auto"
             />
           )}
           <input
@@ -93,7 +112,7 @@ const VideoConverter = () => {
         </div>
 
         {video && (
-          <div className="space-y-6 bg-card p-6 rounded-lg">
+          <div className="space-y-6 bg-card p-6">
             <div className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
               <h2 className="text-xl font-semibold">Conversion Settings</h2>
@@ -142,7 +161,7 @@ const VideoConverter = () => {
             >
               {isConverting ? (
                 <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-t-transparent border-white animate-spin" />
                   Converting...
                 </span>
               ) : (
@@ -152,6 +171,40 @@ const VideoConverter = () => {
                 </span>
               )}
             </Button>
+          </div>
+        )}
+
+        {convertedFiles.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Converted Files</h2>
+            <div className="border bg-card">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {convertedFiles.map((file) => (
+                    <TableRow key={file.id}>
+                      <TableCell>{file.name}</TableCell>
+                      <TableCell>{file.timestamp.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(file.url, '_blank')}
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </div>
