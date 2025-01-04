@@ -33,13 +33,12 @@ export const convertVideoToGif = async (
   },
   onLog: (message: string) => void
 ): Promise<Blob> => {
-  let ffmpeg: FFmpeg;
+  let ffmpeg: FFmpeg | null = null;
   
   try {
     ffmpeg = await ensureFFmpeg();
     onLog('FFmpeg loaded successfully');
     
-    // Write the input video file to FFmpeg's virtual filesystem
     const inputFileName = 'input-' + Date.now() + '.mp4';
     const outputFileName = 'output.gif';
     
@@ -55,18 +54,13 @@ export const convertVideoToGif = async (
     const videoData = await fetchFile(videoFile);
     await ffmpeg.writeFile(inputFileName, videoData);
     
-    // Get video dimensions
     const dimensions = await getVideoDimensions(videoFile);
-    
-    // Calculate the height maintaining aspect ratio
     const aspectRatio = dimensions.width / dimensions.height;
     const height = Math.round(settings.width / aspectRatio);
     
-    // Construct the FFmpeg command
     const fps = Math.min(settings.fps, 30);
     const scale = `scale=${settings.width}:${height}:flags=lanczos`;
     
-    // Execute the conversion
     await ffmpeg.exec([
       '-i', inputFileName,
       '-vf', `${scale},fps=${fps}`,
@@ -74,12 +68,10 @@ export const convertVideoToGif = async (
       '-y', outputFileName
     ]);
     
-    // Read the output file
     onLog('Reading converted file...');
     const data = await ffmpeg.readFile(outputFileName);
     const gifBlob = new Blob([data], { type: 'image/gif' });
     
-    // Clean up
     await ffmpeg.deleteFile(inputFileName);
     await ffmpeg.deleteFile(outputFileName);
     
@@ -90,5 +82,13 @@ export const convertVideoToGif = async (
     console.error('Conversion error:', error);
     onLog(`Error during conversion: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
+  } finally {
+    if (ffmpeg) {
+      try {
+        await ffmpeg.terminate();
+      } catch (e) {
+        console.error('Error terminating FFmpeg:', e);
+      }
+    }
   }
 };
