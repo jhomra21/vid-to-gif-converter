@@ -19,8 +19,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   worker: {
-    format: 'es',
-    plugins: []
+    format: 'es'
   },
   optimizeDeps: {
     exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
