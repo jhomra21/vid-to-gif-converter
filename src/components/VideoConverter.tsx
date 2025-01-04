@@ -5,6 +5,7 @@ import FileUpload from './FileUpload';
 import ConversionSettings from './ConversionSettings';
 import ConversionProgress from './ConversionProgress';
 import ConvertedFilesList from './ConvertedFilesList';
+import ConversionLogs from './ConversionLogs';
 
 interface ConvertedFile {
   id: string;
@@ -23,19 +24,26 @@ const VideoConverter = () => {
   });
   const [isConverting, setIsConverting] = useState(false);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
+  const [conversionLogs, setConversionLogs] = useState<string[]>([]);
   const { toast } = useToast();
 
   const handleFileSelect = (file: File, previewUrl: string) => {
     setVideo(file);
     setPreview(previewUrl);
+    setConversionLogs([]); // Clear logs when new file is selected
+  };
+
+  const addLog = (message: string) => {
+    setConversionLogs(prev => [...prev, message]);
   };
 
   const handleConvert = async () => {
     if (!video) return;
     
     setIsConverting(true);
+    setConversionLogs([]); // Clear previous logs
     try {
-      const gifBlob = await convertVideoToGif(video, settings);
+      const gifBlob = await convertVideoToGif(video, settings, addLog);
       const gifUrl = URL.createObjectURL(gifBlob);
       
       const newFile: ConvertedFile = {
@@ -82,6 +90,8 @@ const VideoConverter = () => {
               isConverting={isConverting}
               onConvert={handleConvert}
             />
+
+            <ConversionLogs logs={conversionLogs} />
           </>
         )}
 
