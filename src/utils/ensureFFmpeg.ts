@@ -3,6 +3,9 @@ import { toBlobURL } from '@ffmpeg/util';
 
 let ffmpeg: FFmpeg | null = null;
 
+// R2 bucket URL - replace with your actual R2 bucket URL
+const R2_BUCKET_URL = import.meta.env.VITE_R2_BUCKET_URL || '';
+
 export const ensureFFmpeg = async (): Promise<FFmpeg> => {
   if (ffmpeg) {
     try {
@@ -15,18 +18,21 @@ export const ensureFFmpeg = async (): Promise<FFmpeg> => {
     }
   }
 
+  if (!R2_BUCKET_URL) {
+    throw new Error('R2 bucket URL is not configured. Please check your environment variables.');
+  }
+
   ffmpeg = new FFmpeg();
 
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm';
   try {
     await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      coreURL: await toBlobURL(`${R2_BUCKET_URL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${R2_BUCKET_URL}/ffmpeg-core.wasm`, 'application/wasm'),
     });
   } catch (error) {
     console.error('Failed to load FFmpeg:', error);
     ffmpeg = null;
-    throw new Error('Failed to load FFmpeg. Please check your internet connection and try again.');
+    throw new Error('Failed to load FFmpeg. Please check if FFmpeg files are accessible and try again.');
   }
 
   return ffmpeg;
