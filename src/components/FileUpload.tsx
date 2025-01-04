@@ -38,7 +38,7 @@ const FileUpload = ({ onFileSelect }: FileUploadProps) => {
 
   return (
     <div
-      className="border-2 border-dashed border-border bg-background hover:bg-secondary/50 transition-colors cursor-pointer"
+      className="border-2 border-dashed border-border bg-card hover:bg-secondary/50 transition-colors cursor-pointer"
       onClick={() => fileInputRef.current?.click()}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}

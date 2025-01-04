@@ -63,7 +63,7 @@ const VideoConverter = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-8">
+    <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-8 bg-industrial-gradient">
       <div className="w-full max-w-3xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold">Video to GIF</h1>
@@ -82,7 +82,7 @@ const VideoConverter = () => {
             <Button
               onClick={handleConvert}
               disabled={isConverting}
-              className="w-full"
+              className="w-full bg-industrial-accent hover:bg-industrial-accent/90"
             >
               {isConverting ? (
                 <span className="flex items-center gap-2">
