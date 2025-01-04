@@ -11,7 +11,7 @@ const ConversionProgress = ({ isConverting, onConvert }: ConversionProgressProps
     <Button
       onClick={onConvert}
       disabled={isConverting}
-      className="w-full bg-industrial-accent hover:bg-industrial-accent/90 relative h-12"
+      className="w-full bg-gray-900 hover:bg-gray-800 relative h-12 font-mono"
     >
       {isConverting ? (
         <div className="flex items-center gap-3">

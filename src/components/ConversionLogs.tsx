@@ -18,10 +18,10 @@ const ConversionLogs = ({ logs }: ConversionLogsProps) => {
   if (logs.length === 0) return null;
 
   return (
-    <ScrollArea className="h-[200px] w-full rounded-md border border-zinc-800 bg-zinc-900/50 p-4">
+    <ScrollArea className="h-[200px] w-full rounded-sm border border-gray-200 bg-gray-50 p-4">
       <div className="space-y-2">
         {logs.map((log, index) => (
-          <div key={index} className="font-mono text-sm text-zinc-400">
+          <div key={index} className="font-mono text-sm text-gray-600">
             {log}
           </div>
         ))}
