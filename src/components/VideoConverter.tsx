@@ -35,6 +35,7 @@ const VideoConverter = () => {
 
   const addLog = (message: string) => {
     setConversionLogs(prev => [...prev, message]);
+    console.log(message); // Also log to console for debugging
   };
 
   const handleConvert = async () => {
