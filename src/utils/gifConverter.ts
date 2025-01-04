@@ -14,7 +14,14 @@ export const convertVideoToGif = (
     
     video.onloadeddata = () => {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      // Add willReadFrequently attribute to optimize canvas operations
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+
       const aspectRatio = video.videoWidth / video.videoHeight;
       const height = Math.round(settings.width / aspectRatio);
       
@@ -29,30 +36,40 @@ export const convertVideoToGif = (
         workerScript: '/gif.worker.js'
       });
 
+      let framesProcessed = 0;
       const frameCount = Math.round((video.duration * settings.fps));
-      let currentFrame = 0;
 
       function addFrame() {
-        if (currentFrame >= frameCount) {
+        if (framesProcessed >= frameCount) {
           gif.render();
           return;
         }
 
-        video.currentTime = currentFrame / settings.fps;
-        currentFrame++;
+        const currentTime = framesProcessed / settings.fps;
+        if (currentTime > video.duration) {
+          gif.render();
+          return;
+        }
+
+        video.currentTime = currentTime;
+        framesProcessed++;
 
         video.onseeked = () => {
-          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           gif.addFrame(ctx, { copy: true, delay: 1000 / settings.fps });
           addFrame();
         };
       }
 
       gif.on('finished', (blob: Blob) => {
+        // Clean up resources
+        URL.revokeObjectURL(video.src);
         resolve(blob);
       });
 
       gif.on('error', (error: Error) => {
+        // Clean up resources
+        URL.revokeObjectURL(video.src);
         reject(error);
       });
 
@@ -60,6 +77,7 @@ export const convertVideoToGif = (
     };
 
     video.onerror = () => {
+      URL.revokeObjectURL(video.src);
       reject(new Error('Failed to load video'));
     };
   });
