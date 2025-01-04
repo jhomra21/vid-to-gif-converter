@@ -40,8 +40,8 @@ export const convertVideoToGif = (
       onLog(`Initializing GIF encoder (${settings.width}x${height})`);
 
       const gif = new GIF({
-        workers: 4,
-        quality: Math.max(1, Math.round(31 - (settings.quality * 0.3))),
+        workers: 2,
+        quality: 10,
         width: settings.width,
         height: height,
         workerScript: '/gif.worker.js',
@@ -72,8 +72,10 @@ export const convertVideoToGif = (
 
       video.onseeked = () => {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const delay = Math.round(1000 / settings.fps);
-        gif.addFrame(ctx, { copy: true, delay: delay });
+        
+        gif.addFrame(imageData, { delay: delay });
         
         currentFrameIndex++;
         
