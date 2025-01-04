@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
-import { Upload } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import React, { useRef } from 'react';
+import { Upload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface FileUploadProps {
   onFileSelect: (file: File, previewUrl: string) => void;
@@ -8,63 +8,52 @@ interface FileUploadProps {
 
 const FileUpload = ({ onFileSelect }: FileUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string>('');
-  const { toast } = useToast();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('video/')) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      onFileSelect(file, url);
-    } else {
-      toast({
-        title: "Invalid file",
-        description: "Please select a valid video file.",
-        variant: "destructive",
-      });
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      onFileSelect(file, previewUrl);
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('video/')) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      onFileSelect(file, url);
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      onFileSelect(file, previewUrl);
     }
   };
 
   return (
     <div
-      className="border-2 border-dashed border-border bg-card hover:bg-secondary/50 transition-colors cursor-pointer"
+      className="border-2 border-dashed border-border hover:bg-secondary/50 transition-colors cursor-pointer"
       onClick={() => fileInputRef.current?.click()}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      {!preview ? (
-        <div className="p-8 space-y-4">
-          <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
-          <div>
-            <p className="text-lg">Drag and drop your video here</p>
-            <p className="text-sm text-muted-foreground">or click to browse</p>
-          </div>
-        </div>
-      ) : (
-        <video
-          src={preview}
-          controls
-          className="w-full h-auto"
-        />
-      )}
       <input
-        type="file"
         ref={fileInputRef}
-        onChange={handleFileChange}
+        type="file"
         accept="video/*"
+        capture="environment"
         className="hidden"
+        onChange={handleFileChange}
       />
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Upload className="w-12 h-12 mb-4 text-muted-foreground" />
+        <div className="space-y-2">
+          <p className="text-lg">Drop your video here</p>
+          <p className="text-sm text-muted-foreground">or click to browse</p>
+          <Button variant="outline" size="sm" className="mt-2">
+            Select Video
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Supports all common video formats from mobile and desktop devices
+        </p>
+      </div>
     </div>
   );
 };
