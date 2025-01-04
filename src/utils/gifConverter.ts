@@ -39,15 +39,15 @@ export const convertVideoToGif = (
       
       onLog(`Initializing GIF encoder (${settings.width}x${height})`);
 
-      // Create a new GIF instance with modified settings
       const gif = new GIF({
-        workers: 2,
-        quality: 1,
+        workers: 4,
+        quality: 10,
         width: settings.width,
         height: height,
         debug: true,
-        dither: false,
-        repeat: 0
+        dither: true,
+        repeat: 0,
+        background: '#000000'
       });
 
       const frames: number[] = [];
@@ -84,8 +84,7 @@ export const convertVideoToGif = (
           
           gif.addFrame(imageData, {
             delay: Math.round(1000 / settings.fps),
-            copy: true,
-            transparent: false
+            copy: true
           });
           
           currentFrameIndex++;
