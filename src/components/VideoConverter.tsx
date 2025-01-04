@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload, Settings, Download } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { convertVideoToGif } from '@/utils/gifConverter';
 
 interface ConvertedFile {
   id: string;
@@ -52,25 +53,34 @@ const VideoConverter = () => {
   };
 
   const handleConvert = async () => {
+    if (!video) return;
+    
     setIsConverting(true);
-    // In a real implementation, we would convert the video to GIF here
-    // For now, we'll just simulate the conversion
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Add the converted file to the list
-    const newFile: ConvertedFile = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: video?.name.replace(/\.[^/.]+$/, "") + ".gif",
-      url: preview, // In a real implementation, this would be the GIF URL
-      timestamp: new Date(),
-    };
-    
-    setConvertedFiles(prev => [newFile, ...prev]);
-    setIsConverting(false);
-    toast({
-      title: "Conversion complete",
-      description: "Your GIF is ready to download!",
-    });
+    try {
+      const gifBlob = await convertVideoToGif(video, settings);
+      const gifUrl = URL.createObjectURL(gifBlob);
+      
+      const newFile: ConvertedFile = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: video.name.replace(/\.[^/.]+$/, "") + ".gif",
+        url: gifUrl,
+        timestamp: new Date(),
+      };
+      
+      setConvertedFiles(prev => [newFile, ...prev]);
+      toast({
+        title: "Conversion complete",
+        description: "Your GIF is ready to download!",
+      });
+    } catch (error) {
+      toast({
+        title: "Conversion failed",
+        description: error instanceof Error ? error.message : "An error occurred during conversion",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   return (
