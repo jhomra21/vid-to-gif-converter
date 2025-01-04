@@ -1,6 +1,28 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
+const getVideoDimensions = (videoFile: File): Promise<{ width: number, height: number }> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+      resolve({
+        width: video.videoWidth,
+        height: video.videoHeight
+      });
+    };
+    
+    video.onerror = () => {
+      URL.revokeObjectURL(video.src);
+      reject(new Error('Failed to load video metadata'));
+    };
+    
+    video.src = URL.createObjectURL(videoFile);
+  });
+};
+
 export const convertVideoToGif = async (
   videoFile: File,
   settings: {
@@ -37,8 +59,11 @@ export const convertVideoToGif = async (
     const videoData = await fetchFile(videoFile);
     await ffmpeg.writeFile(inputFileName, videoData);
     
+    // Get video dimensions
+    const dimensions = await getVideoDimensions(videoFile);
+    
     // Calculate the height maintaining aspect ratio
-    const aspectRatio = videoFile.width / videoFile.height;
+    const aspectRatio = dimensions.width / dimensions.height;
     const height = Math.round(settings.width / aspectRatio);
     
     // Construct the FFmpeg command
