@@ -46,7 +46,8 @@ export const convertVideoToGif = (
         height: height,
         workerScript: '/gif.worker.js',
         debug: true,
-        dither: false
+        dither: false,
+        repeat: 0
       });
 
       const frames: number[] = [];
@@ -64,7 +65,12 @@ export const convertVideoToGif = (
       const processNextFrame = () => {
         if (currentFrameIndex >= frames.length) {
           onLog('All frames captured, rendering GIF...');
-          gif.render();
+          try {
+            gif.render();
+          } catch (error) {
+            onLog(`Error during render: ${error}`);
+            reject(error);
+          }
           return;
         }
 
@@ -72,19 +78,28 @@ export const convertVideoToGif = (
       };
 
       video.onseeked = () => {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const delay = Math.round(1000 / settings.fps);
-        
-        gif.addFrame(imageData, { delay: delay, copy: true });
-        
-        currentFrameIndex++;
-        
-        if (currentFrameIndex % 10 === 0 || currentFrameIndex === frames.length) {
-          onLog(`Processed ${currentFrameIndex} of ${frames.length} frames`);
+        try {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const delay = Math.round(1000 / settings.fps);
+          
+          gif.addFrame(imageData, { 
+            delay: delay, 
+            copy: true,
+            transparent: false 
+          });
+          
+          currentFrameIndex++;
+          
+          if (currentFrameIndex % 10 === 0 || currentFrameIndex === frames.length) {
+            onLog(`Processed ${currentFrameIndex} of ${frames.length} frames`);
+          }
+          
+          processNextFrame();
+        } catch (error) {
+          onLog(`Error processing frame ${currentFrameIndex}: ${error}`);
+          reject(error);
         }
-        
-        processNextFrame();
       };
 
       gif.on('progress', (progress: number) => {
@@ -99,7 +114,7 @@ export const convertVideoToGif = (
       });
 
       gif.on('error', (error: Error) => {
-        onLog(`Error: ${error.message}`);
+        onLog(`GIF encoder error: ${error.message}`);
         URL.revokeObjectURL(video.src);
         reject(error);
       });
