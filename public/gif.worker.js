@@ -1,1 +1,0 @@
-// This file will be automatically created by gif.js when it loads
