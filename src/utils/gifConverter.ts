@@ -40,11 +40,12 @@ export const convertVideoToGif = (
       onLog(`Initializing GIF encoder (${settings.width}x${height})`);
 
       const gif = new GIF({
-        workers: 2,
-        quality: Math.round(31 - (settings.quality * 0.3)),
+        workers: 4, // Increased from 2 to 4 for better performance
+        quality: Math.max(1, Math.round(31 - (settings.quality * 0.3))), // Ensure quality is at least 1
         width: settings.width,
         height: height,
-        workerScript: '/gif.worker.js'
+        workerScript: '/gif.worker.js',
+        debug: true // Enable debug mode for better error reporting
       });
 
       const frames: number[] = [];
@@ -71,7 +72,7 @@ export const convertVideoToGif = (
 
       video.onseeked = () => {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        gif.addFrame(ctx, { copy: true, delay: 1000 / settings.fps });
+        gif.addFrame(ctx, { copy: true, delay: Math.round(1000 / settings.fps) });
         currentFrameIndex++;
         
         if (currentFrameIndex % 10 === 0) {
