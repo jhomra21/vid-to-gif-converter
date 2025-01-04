@@ -42,10 +42,9 @@ export const convertVideoToGif = (
       // Create a new GIF instance with modified settings
       const gif = new GIF({
         workers: 2,
-        quality: 1, // Lower quality for better performance
+        quality: 1,
         width: settings.width,
         height: height,
-        workerScript: window.location.origin + '/gif.worker.js', // Use absolute path
         debug: true,
         dither: false,
         repeat: 0
