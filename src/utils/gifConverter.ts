@@ -40,14 +40,12 @@ export const convertVideoToGif = (
       onLog(`Initializing GIF encoder (${settings.width}x${height})`);
 
       const gif = new GIF({
-        workers: 4,
-        quality: 10,
+        workers: 2,
+        quality: 30,
         width: settings.width,
         height: height,
-        debug: true,
-        dither: true,
-        repeat: 0,
-        background: '#000000'
+        workerScript: '/gif.worker.js',
+        debug: true
       });
 
       const frames: number[] = [];
@@ -83,8 +81,7 @@ export const convertVideoToGif = (
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           
           gif.addFrame(imageData, {
-            delay: Math.round(1000 / settings.fps),
-            copy: true
+            delay: Math.round(1000 / settings.fps)
           });
           
           currentFrameIndex++;
