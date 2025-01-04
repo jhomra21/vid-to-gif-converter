@@ -22,15 +22,7 @@ import ConversionLogs from './ConversionLogs';
 import { Button } from "@/components/ui/button";
 import LocationWeather from './LocationWeather';
 import { ExternalLink, Download, Loader2 } from 'lucide-react';
-
-interface ConvertedFile {
-  id: string;
-  name: string;
-  url: string;
-  timestamp: Date;
-  originalSize: number;
-  convertedSize?: number;
-}
+import { ConvertedFileInfo, type ConvertedFile } from './ConvertedFileInfo';
 
 const VideoConverter = () => {
   const [video, setVideo] = useState<File | null>(null);
@@ -156,6 +148,7 @@ const VideoConverter = () => {
         timestamp: new Date(),
         originalSize: video.size,
         convertedSize: gifBlob.size,
+        settings: { ...settings }, // Store the settings used for this conversion
       };
       
       setConvertedFiles(prev => [newFile, ...prev]);
@@ -222,8 +215,8 @@ const VideoConverter = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
           <h1 className="text-4xl font-bold font-mono">Video to GIF</h1>
           <p className="text-muted-foreground font-mono">
             Convert your videos to GIF format with custom settings
@@ -304,60 +297,43 @@ const VideoConverter = () => {
                     />
 
                     {convertedFiles.length > 0 && (
-                      <div className="flex items-center justify-between p-4 border bg-muted/50">
-                        <div className="flex items-center gap-4">
-                          <img 
-                            src={convertedFiles[0].url} 
-                            alt="Recent conversion"
-                            className="w-12 h-12 object-cover bg-background"
-                          />
-                          <div className="space-y-1">
-                            <p className="text-sm font-medium">{convertedFiles[0].name}</p>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>{Math.round(convertedFiles[0].convertedSize! / 1024)} KB</span>
-                              {convertedFiles[0].originalSize && convertedFiles[0].convertedSize && (
-                                <span className={cn(
-                                  "px-1 py-0.5 text-xs rounded-md font-medium",
-                                  convertedFiles[0].convertedSize < convertedFiles[0].originalSize 
-                                    ? "bg-green-100 text-green-700" 
-                                    : "bg-red-100 text-red-700"
-                                )}>
-                                  {((convertedFiles[0].convertedSize - convertedFiles[0].originalSize) / convertedFiles[0].originalSize * 100).toFixed(1)}%
-                                </span>
-                              )}
-                            </div>
+                      <div className="space-y-4">
+                        {/* Main preview - most recent conversion */}
+                        <ConvertedFileInfo
+                          file={convertedFiles[0]}
+                          loading={loading[convertedFiles[0].id]}
+                          onDownload={handleDownload}
+                          onDelete={handleDelete}
+                          showDelete
+                        />
+
+                        {/* History section */}
+                        <div className="border-t pt-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-medium text-muted-foreground">Recent Conversions</h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setActiveTab('history')}
+                              className="text-xs font-mono"
+                            >
+                              View Conversion History
+                            </Button>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => window.open(convertedFiles[0].url, '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleDownload(convertedFiles[0])}
-                            disabled={loading[convertedFiles[0].id]}
-                          >
-                            {loading[convertedFiles[0].id] ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Download className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setActiveTab('history')}
-                            className="text-xs hidden sm:inline-flex"
-                          >
-                            View History
-                          </Button>
+                          
+                          <div className="space-y-2">
+                            {convertedFiles.slice(1, 4).map(file => (
+                              <ConvertedFileInfo
+                                key={file.id}
+                                file={file}
+                                loading={loading[file.id]}
+                                onDownload={handleDownload}
+                                onDelete={handleDelete}
+                                showDelete
+                                compact
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}

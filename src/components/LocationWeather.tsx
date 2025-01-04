@@ -27,7 +27,7 @@ type TempUnit = 'C' | 'F';
 const api = {
   location: {
     fetch: async (): Promise<LocationData> => {
-      const res = await fetch('https://ipapi.co/json/');
+      const res = await fetch('https://ipwho.is/');
       if (!res.ok) {
         throw {
           message: 'Failed to fetch location',
@@ -151,7 +151,7 @@ const LocationWeather = () => {
         <img 
           src={`https://openweathermap.org/img/wn/${weatherQuery.data.icon}.png`}
           alt={weatherQuery.data.description}
-          className="w-4 h-4"
+          className="w-4 h-4 invert opacity-75"
           loading="lazy"
           width={16}
           height={16}
