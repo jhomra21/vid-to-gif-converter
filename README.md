@@ -1,69 +1,83 @@
-# Welcome to your Lovable project
+# Video to GIF Converter
 
-## Project info
+A modern web application that converts video files to optimized GIF format, built with cutting-edge web technologies.
 
-**URL**: `https://lovable.dev/projects/54beb22f-d8dd-49e4-b8d8-a91e1415cb05`
+## Features
 
-## How can I edit this code?
+- Video to GIF conversion with client-side processing
+- Customizable output settings
+- Batch processing support
+- Real-time preview
+- Responsive design
+- Optimized file size reduction
+- Download and share capabilities
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+This project leverages modern web technologies:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/54beb22f-d8dd-49e4-b8d8-a91e1415cb05) and start prompting.
+- **Framework**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **UI Components**: shadcn/ui + Radix UI
+- **Styling**: Tailwind CSS
+- **Video Processing**: FFMPEG WASM
+- **State Management**: TanStack Query
+- **Package Manager**: Bun
+- **Deployment**: Cloudflare Pages
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+The only requirement is having Bun installed - [install Bun](https://bun.sh/docs/installation)
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-`git clone <YOUR_GIT_URL>`
+# Step 1: Clone the repository
+git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-`cd <YOUR_PROJECT_NAME>`
+# Step 2: Navigate to the project directory
+cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-`npm i`
+# Step 3: Install dependencies
+bun install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-`npm run dev`
+# Step 4: Start the development server
+bun dev
 ```
 
-**Edit a file directly in GitHub**
+## Development
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+There are several ways to work with this codebase:
 
-**Use GitHub Codespaces**
+**Local Development**
+- Use your preferred IDE
+- Run `bun dev` for hot-reload development
+- Access the dev server at `http://localhost:8080`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**GitHub Integration**
+- Edit files directly in GitHub's web interface
+- Use GitHub Codespaces for cloud development
+- Create branches for new features
+- Submit pull requests for review
 
-## What technologies are used for this project?
+## Deployment
 
-This project is built with:
+The application is configured for deployment on Cloudflare Pages with optimized build settings:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Automatic deployments on push to main
+- Asset optimization and minification
+- Efficient chunk splitting
+- Modern ES modules support
 
-## How can I deploy this project?
+## Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/54beb22f-d8dd-49e4-b8d8-a91e1415cb05) and click on Share -> Publish.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
 
-## I want to use a custom domain - is that possible?
+## Custom Domain Setup
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+For custom domain deployment, we recommend using Cloudflare Pages or Netlify. Configure your DNS settings according to your provider's documentation.
+
+---
+*Originally created at lovable.dev*
