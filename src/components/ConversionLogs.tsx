@@ -10,7 +10,8 @@ const ConversionLogs = ({ logs }: ConversionLogsProps) => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const scrollContainer = scrollRef.current;
+      scrollContainer.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [logs]);
 
@@ -18,12 +19,13 @@ const ConversionLogs = ({ logs }: ConversionLogsProps) => {
 
   return (
     <ScrollArea className="h-[200px] w-full rounded-md border border-zinc-800 bg-zinc-900/50 p-4">
-      <div ref={scrollRef} className="space-y-2">
+      <div className="space-y-2">
         {logs.map((log, index) => (
           <div key={index} className="font-mono text-sm text-zinc-400">
             {log}
           </div>
         ))}
+        <div ref={scrollRef} />
       </div>
     </ScrollArea>
   );
