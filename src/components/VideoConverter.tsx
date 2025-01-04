@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { convertVideoToGif } from '@/utils/gifConverter';
+import { ensureFFmpeg } from '@/utils/ensureFFmpeg';
 import FileUpload from './FileUpload';
 import ConversionSettings from './ConversionSettings';
 import ConversionProgress from './ConversionProgress';
@@ -26,6 +27,17 @@ const VideoConverter = () => {
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
   const [conversionLogs, setConversionLogs] = useState<string[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Preload FFmpeg when component mounts
+    ensureFFmpeg().catch(error => {
+      toast({
+        title: "Failed to load converter",
+        description: "Please check your internet connection and try again.",
+        variant: "destructive",
+      });
+    });
+  }, []);
 
   const handleFileSelect = (file: File, previewUrl: string) => {
     setVideo(file);
