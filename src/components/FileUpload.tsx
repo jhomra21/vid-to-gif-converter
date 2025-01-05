@@ -37,7 +37,6 @@ const FileUpload = ({ onFileSelect }: FileUploadProps) => {
         ref={fileInputRef}
         type="file"
         accept="video/*"
-        capture="environment"
         className="hidden"
         onChange={handleFileChange}
       />
