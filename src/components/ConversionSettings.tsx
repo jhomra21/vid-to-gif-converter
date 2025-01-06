@@ -190,10 +190,29 @@ const ConversionSettings = ({ settings, onSettingsChange }: ConversionSettingsPr
                 type="number"
                 value={settings.width}
                 onChange={(e) => {
-                  const width = Math.max(100, Math.min(1920, parseInt(e.target.value) || 100));
-                  onSettingsChange({ ...settings, width });
+                  const value = e.target.value;
+                  const width = parseInt(value);
+                  if (!isNaN(width)) {
+                    onSettingsChange({ ...settings, width });
+                  }
                 }}
-                className="font-mono"
+                onBlur={(e) => {
+                  const width = parseInt(e.target.value);
+                  if (isNaN(width)) {
+                    onSettingsChange({ ...settings, width: 800 });
+                    return;
+                  }
+                  const constrainedWidth = Math.max(100, Math.min(1920, width));
+                  if (constrainedWidth !== width) {
+                    onSettingsChange({ ...settings, width: constrainedWidth });
+                  }
+                }}
+                className={cn(
+                  "font-mono",
+                  settings.width < 100 || settings.width > 1920 ? "border-red-500" : ""
+                )}
+                min={100}
+                max={1920}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Min: 100px</span>
