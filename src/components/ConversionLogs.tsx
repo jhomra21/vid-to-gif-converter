@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 interface ConversionLogsProps {
   logs: string[];
@@ -33,7 +34,11 @@ const ConversionLogs = ({ logs }: ConversionLogsProps) => {
   };
 
   return (
-    <Card className="relative">
+    <Card className={cn(
+      "relative transition-all duration-300 ease-out",
+      "data-[state=closed]:translate-y-[-10px] data-[state=closed]:opacity-0",
+      "data-[state=open]:translate-y-0 data-[state=open]:opacity-100"
+    )}>
       <div className="absolute right-2 top-2 z-10">
         <Button
           variant="ghost"

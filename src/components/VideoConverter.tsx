@@ -21,8 +21,9 @@ import ConvertedFilesList from './ConvertedFilesList';
 import ConversionLogs from './ConversionLogs';
 import { Button } from "@/components/ui/button";
 import LocationWeather from './LocationWeather';
-import { ExternalLink, Download, Loader2 } from 'lucide-react';
+import { ExternalLink, Download, Loader2, ChevronDown } from 'lucide-react';
 import { ConvertedFileInfo, type ConvertedFile } from './ConvertedFileInfo';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const VideoConverter = () => {
   const [video, setVideo] = useState<File | null>(null);
@@ -48,6 +49,7 @@ const VideoConverter = () => {
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [conversionProgress, setConversionProgress] = useState(0);
   const [conversionPhase, setConversionPhase] = useState<'initializing' | 'converting'>('initializing');
+  const [showLogs, setShowLogs] = useState(false);
 
   useEffect(() => {
     // Preload FFmpeg when component mounts
@@ -349,18 +351,48 @@ const VideoConverter = () => {
                         onSettingsChange={setSettings}
                       />
 
-                      <div className="space-y-4">
-                        <h2 className="text-lg font-medium">Conversion Logs</h2>
-                        <ConversionLogs logs={conversionLogs} />
-                      </div>
+                      <Collapsible open={showLogs} onOpenChange={setShowLogs}>
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-lg font-medium">Conversion Logs</h2>
+                          <CollapsibleTrigger asChild>
+                            <Button variant="ghost" size="sm" className="w-9 p-0">
+                              <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", {
+                                "transform rotate-180": showLogs
+                              })}/>
+                              <span className="sr-only">Toggle logs</span>
+                            </Button>
+                          </CollapsibleTrigger>
+                        </div>
+                        <CollapsibleContent className="transition-all duration-300 ease-out data-[state=closed]:animate-collapse data-[state=open]:animate-expand overflow-hidden">
+                          <div className="pt-4">
+                            <ConversionLogs logs={conversionLogs} />
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                   </div>
                 </div>
 
                 {/* Mobile Logs */}
                 <div className="md:hidden space-y-4">
-                  <h2 className="text-lg font-medium">Conversion Logs</h2>
-                  <ConversionLogs logs={conversionLogs} />
+                  <Collapsible open={showLogs} onOpenChange={setShowLogs}>
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-medium">Conversion Logs</h2>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm" className="w-9 p-0">
+                          <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", {
+                            "transform rotate-180": showLogs
+                          })}/>
+                          <span className="sr-only">Toggle logs</span>
+                        </Button>
+                      </CollapsibleTrigger>
+                    </div>
+                    <CollapsibleContent className="transition-all duration-300 ease-out data-[state=closed]:animate-collapse data-[state=open]:animate-expand overflow-hidden">
+                      <div className="pt-4">
+                        <ConversionLogs logs={conversionLogs} />
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </div>
               </div>
             )}
